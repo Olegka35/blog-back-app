@@ -8,7 +8,7 @@
     
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
     
     <servlet>
@@ -21,7 +21,7 @@
         </init-param>
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>com.tarasov.configuration.WebConfig</param-value>
+            <param-value>com.tarasov.configuration.WebConfiguration</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

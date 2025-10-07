@@ -7,6 +7,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "com.tarasov.controller")
-public class WebConfig {
+@ComponentScan(basePackages = "com.tarasov")
+public class WebConfiguration {
 }
