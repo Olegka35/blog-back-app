@@ -1,0 +1,3 @@
+spring.datasource.url: jdbc:postgresql://localhost:5433/blog_db
+spring.datasource.username: postgres
+spring.datasource.password: postgres

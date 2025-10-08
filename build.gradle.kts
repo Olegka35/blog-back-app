@@ -14,6 +14,8 @@ dependencies {
     implementation(platform("org.springframework:spring-framework-bom:6.2.11"))
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework:spring-aspects")
+    implementation("org.springframework.data:spring-data-jdbc:3.5.4")
+    implementation("org.postgresql:postgresql:42.7.8")
     compileOnly("jakarta.servlet:jakarta.servlet-api:6.1.0")
 
     implementation(platform("com.fasterxml.jackson:jackson-bom:2.20.0"))
