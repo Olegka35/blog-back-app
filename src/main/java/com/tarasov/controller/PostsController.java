@@ -2,13 +2,13 @@ package com.tarasov.controller;
 
 
 import com.tarasov.model.dto.posts.PostCreateRequest;
+import com.tarasov.model.dto.posts.PostListResponse;
 import com.tarasov.model.dto.posts.PostResponse;
 import com.tarasov.model.dto.posts.PostUpdateRequest;
 import com.tarasov.service.PostsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,12 +23,13 @@ public class PostsController {
     }
 
     @GetMapping
-    public List<PostResponse> getPosts(@RequestParam("search") String search,
-                                       @RequestParam("pageSize") int pageSize) {
-        List<PostResponse> posts = new ArrayList<>();
-        posts.add(new PostResponse(1, "Test Post", "Text", List.of("tag1", "tag2"), 0, 1));
-        posts.add(new PostResponse(2, "Test Post 2", "Text2 21", List.of(), 0, 0));
-        return posts;
+    public PostListResponse searchPosts(@RequestParam("search") String search,
+                                        @RequestParam("pageSize") int pageSize,
+                                        @RequestParam("pageNumber") int pageNumber) {
+        if (pageSize <= 0 || pageNumber <= 0) {
+            throw new IllegalArgumentException("pageSize and pageNumber must be 1 or higher");
+        }
+        return postsService.searchPosts(search, pageSize, pageNumber);
     }
 
     @GetMapping("/{id}")
