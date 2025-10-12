@@ -2,10 +2,7 @@ package com.tarasov.service.impl;
 
 import com.tarasov.model.Post;
 import com.tarasov.model.PostSearchCondition;
-import com.tarasov.model.dto.posts.PostCreateRequest;
-import com.tarasov.model.dto.posts.PostListResponse;
-import com.tarasov.model.dto.posts.PostResponse;
-import com.tarasov.model.dto.posts.PostSearchResult;
+import com.tarasov.model.dto.posts.*;
 import com.tarasov.repository.PostsRepository;
 import com.tarasov.service.PostsService;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -70,6 +65,33 @@ public class PostsServiceImpl implements PostsService {
         return PostResponse.from(post);
     }
 
+    @Override
+    public PostResponse updatePost(long id, PostUpdateRequest request) {
+        if (request.id() != id) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Post id mismatch");
+        }
+        Optional<Post> post = postsRepository.findPost(id);
+        return post.map(p -> {
+            syncTags(id, new HashSet<>(request.tags()), new HashSet<>(p.getTags()));
+            postsRepository.updatePost(id, request.title(), request.text());
+            p.setText(request.text());
+            p.setTitle(request.title());
+            return PostResponse.from(p);
+        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+    }
+
+    @Override
+    public void deletePost(long id) {
+        postsRepository.deletePostTags(id);
+        postsRepository.deletePostComments(id);
+        postsRepository.deletePost(id);
+    }
+
+    @Override
+    public int incrementLikeCount(long postId) {
+        return postsRepository.incrementLikeCount(postId);
+    }
+
     private PostSearchCondition combineSearchCondition(String search, int pageSize, int pageNumber) {
         var searchItems = search.split(" ");
         var partitionedByHash = Arrays.stream(searchItems)
@@ -81,5 +103,18 @@ public class PostsServiceImpl implements PostsService {
                 .toList();
         String title = String.join(" ", partitionedByHash.get(false));
         return new PostSearchCondition(title, tagFilters, pageSize, pageNumber);
+    }
+
+    private void syncTags(long postId, Set<String> newTags, Set<String> oldTags) {
+        oldTags.stream()
+                .filter(tag -> !newTags.contains(tag))
+                .forEach(tag -> {
+                    postsRepository.deleteTag(postId, tag);
+                });
+        newTags.stream()
+                .filter(tag -> !oldTags.contains(tag))
+                .forEach(tag -> {
+                    postsRepository.createTag(postId, tag);
+                });
     }
 }

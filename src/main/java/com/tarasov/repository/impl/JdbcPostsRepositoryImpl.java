@@ -4,11 +4,15 @@ import com.tarasov.model.Post;
 import com.tarasov.model.PostSearchCondition;
 import com.tarasov.model.dto.posts.PostSearchResult;
 import com.tarasov.repository.PostsRepository;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.relational.core.sql.In;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +27,9 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
 
     private final String FIND_TAGS_BY_POST_ID = "SELECT tag FROM tags WHERE post_id = :id";
     private final String CREATE_POST_QUERY = "INSERT INTO posts (title, text) VALUES (:title, :text) RETURNING id";
+    private final String UPDATE_POST_QUERY = "UPDATE posts SET title = :title, text = :text WHERE id = :id";
     private final String CREATE_TAG_QUERY = "INSERT INTO tags (post_id, tag) VALUES (:post_id, :tag)";
+    private final String DELETE_TAG_QUERY = "DELETE FROM tags WHERE post_id = :post_id AND tag = :tag";
     private final String COUNT_POSTS_QUERY = """
         SELECT COUNT(1)
         FROM posts p
@@ -39,6 +45,10 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
         """;
     private final String SEARCH_POST_BY_TITLE_SUBQUERY = "p.title LIKE :title";
     private final String SEARCH_POST_BY_TAG_SUBQUERY = " EXISTS (SELECT tag FROM tags WHERE post_id = p.id AND tag = :%s)";
+    private final String DELETE_POST_QUERY = "DELETE FROM posts WHERE id = :id";
+    private final String DELETE_COMMENTS_BY_POST_ID_QUERY = "DELETE FROM comments WHERE post_id = :post_id";
+    private final String DELETE_TAGS_BY_POST_ID_QUERY = "DELETE FROM tags WHERE post_id = :post_id";
+    private final String INCREMENT_LIKE_COUNT_QUERY = "UPDATE posts SET likes_count = likes_count + 1 WHERE id = :id RETURNING likes_count";
 
     public JdbcPostsRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -62,8 +72,18 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
     }
 
     @Override
+    public void updatePost(long id, String title, String text) {
+        jdbcTemplate.update(UPDATE_POST_QUERY, Map.of("title", title, "text", text, "id", id));
+    }
+
+    @Override
     public void createTag(long postId, String tag) {
         jdbcTemplate.update(CREATE_TAG_QUERY, Map.of("post_id", postId, "tag", tag));
+    }
+
+    @Override
+    public void deleteTag(long postId, String tag) {
+        jdbcTemplate.update(DELETE_TAG_QUERY, Map.of("post_id", postId, "tag", tag));
     }
 
     @Override
@@ -87,6 +107,32 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
                 new PostMapper()
         );
         return new PostSearchResult(posts, count);
+    }
+
+    @Override
+    public void deletePost(long id) {
+        jdbcTemplate.update(DELETE_POST_QUERY, Map.of("id", id));
+    }
+
+    @Override
+    public void deletePostComments(long postId) {
+        jdbcTemplate.update(DELETE_COMMENTS_BY_POST_ID_QUERY, Map.of("post_id", postId));
+    }
+
+    @Override
+    public void deletePostTags(long postId) {
+        jdbcTemplate.update(DELETE_TAGS_BY_POST_ID_QUERY, Map.of("post_id", postId));
+    }
+
+    @Override
+    public int incrementLikeCount(long postId) {
+        Integer newLikeCount = 0;
+        try {
+            newLikeCount = jdbcTemplate.queryForObject(INCREMENT_LIKE_COUNT_QUERY, Map.of("id", postId), Integer.class);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+        return Optional.ofNullable(newLikeCount).orElse(0);
     }
 
     private List<String> getTagsByPostId(long postId) {

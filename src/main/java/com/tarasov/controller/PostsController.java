@@ -47,12 +47,17 @@ public class PostsController {
     @PutMapping("/{id}")
     public PostResponse updatePost(@PathVariable("id") long id,
                                    @RequestBody PostUpdateRequest request) {
-        System.out.println(request);
-        return new PostResponse(1, "Test Post", "Text", List.of("tag1", "tagd2"), 10, 11);
+        return postsService.updatePost(id, request);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable("id") long id) {
+        postsService.deletePost(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/likes")
+    public int addLike(@PathVariable("id") long postId) {
+        return postsService.incrementLikeCount(postId);
     }
 }
