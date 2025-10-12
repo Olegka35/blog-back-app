@@ -45,7 +45,6 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
     private final String SEARCH_POST_BY_TITLE_SUBQUERY = "p.title LIKE :title";
     private final String SEARCH_POST_BY_TAG_SUBQUERY = " EXISTS (SELECT tag FROM tags WHERE post_id = p.id AND tag = :%s)";
     private final String DELETE_POST_QUERY = "DELETE FROM posts WHERE id = :id";
-    private final String DELETE_COMMENTS_BY_POST_ID_QUERY = "DELETE FROM comments WHERE post_id = :post_id";
     private final String DELETE_TAGS_BY_POST_ID_QUERY = "DELETE FROM tags WHERE post_id = :post_id";
     private final String INCREMENT_LIKE_COUNT_QUERY = "UPDATE posts SET likes_count = likes_count + 1 WHERE id = :id RETURNING likes_count";
     private final String UPDATE_POST_IMAGE_QUERY = "UPDATE posts SET image = :image WHERE id = :id";
@@ -116,11 +115,6 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
         if (rowsDeleted == 0) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Post not found");
         }
-    }
-
-    @Override
-    public void deletePostComments(long postId) {
-        jdbcTemplate.update(DELETE_COMMENTS_BY_POST_ID_QUERY, Map.of("post_id", postId));
     }
 
     @Override

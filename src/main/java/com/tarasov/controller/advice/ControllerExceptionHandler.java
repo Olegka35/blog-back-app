@@ -31,7 +31,7 @@ public class ControllerExceptionHandler {
     public Map<String, Object> handleMissedParameterException(Exception exception) {
         LOGGER.error(exception.getMessage(), exception);
         return Map.of("message", exception.getMessage() != null ? exception.getMessage() : "Unexpected error",
-                "timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH24:mm:ss")));
+                "timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 
     @ExceptionHandler(Exception.class)
@@ -40,6 +40,6 @@ public class ControllerExceptionHandler {
         LOGGER.error(exception.getMessage(), exception);
         return Map.of("error", exception.getClass().getName(),
                 "message", exception.getMessage() != null ? exception.getMessage() : "Unexpected error",
-                "timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH24:mm:ss")));
+                "timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 }

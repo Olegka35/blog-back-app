@@ -15,7 +15,6 @@ public interface PostsRepository {
     void deleteTag(long postId, String tag);
     PostSearchResult searchPosts(PostSearchCondition condition);
     void deletePost(long id);
-    void deletePostComments(long postId);
     void deletePostTags(long postId);
     int incrementLikeCount(long postId);
     void updatePostImage(long postId, byte[] image);

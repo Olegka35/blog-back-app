@@ -6,6 +6,7 @@ import com.tarasov.model.dto.posts.PostListResponse;
 import com.tarasov.model.dto.posts.PostResponse;
 import com.tarasov.model.dto.posts.PostUpdateRequest;
 import com.tarasov.service.PostsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +17,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost")
 public class PostsController {
 
     private final PostsService postsService;
-
-    public PostsController(PostsService postsService) {
-        this.postsService = postsService;
-    }
 
     @GetMapping
     public PostListResponse searchPosts(@RequestParam("search") String search,

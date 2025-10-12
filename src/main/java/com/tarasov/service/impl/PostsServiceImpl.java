@@ -3,6 +3,7 @@ package com.tarasov.service.impl;
 import com.tarasov.model.Post;
 import com.tarasov.model.PostSearchCondition;
 import com.tarasov.model.dto.posts.*;
+import com.tarasov.repository.CommentsRepository;
 import com.tarasov.repository.PostsRepository;
 import com.tarasov.service.PostsService;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,11 +21,14 @@ import java.util.stream.Collectors;
 public class PostsServiceImpl implements PostsService {
 
     private final PostsRepository postsRepository;
+    private final CommentsRepository commentsRepository;
     private final int MAX_TEXT_LENGTH;
 
     public PostsServiceImpl(PostsRepository postsRepository,
+                            CommentsRepository commentsRepository,
                             @Value("${posts.search.max-text-length}") int MAX_TEXT_LENGTH) {
         this.postsRepository = postsRepository;
+        this.commentsRepository = commentsRepository;
         this.MAX_TEXT_LENGTH = MAX_TEXT_LENGTH;
     }
 
@@ -85,7 +89,7 @@ public class PostsServiceImpl implements PostsService {
     @Override
     public void deletePost(long id) {
         postsRepository.deletePostTags(id);
-        postsRepository.deletePostComments(id);
+        commentsRepository.deletePostComments(id);
         postsRepository.deletePost(id);
     }
 
