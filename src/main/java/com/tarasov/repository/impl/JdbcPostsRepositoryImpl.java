@@ -5,7 +5,6 @@ import com.tarasov.model.PostSearchCondition;
 import com.tarasov.model.dto.posts.PostSearchResult;
 import com.tarasov.repository.PostsRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -49,6 +48,8 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
     private final String DELETE_COMMENTS_BY_POST_ID_QUERY = "DELETE FROM comments WHERE post_id = :post_id";
     private final String DELETE_TAGS_BY_POST_ID_QUERY = "DELETE FROM tags WHERE post_id = :post_id";
     private final String INCREMENT_LIKE_COUNT_QUERY = "UPDATE posts SET likes_count = likes_count + 1 WHERE id = :id RETURNING likes_count";
+    private final String UPDATE_POST_IMAGE_QUERY = "UPDATE posts SET image = :image WHERE id = :id";
+    private final String GET_POST_IMAGE_QUERY = "SELECT image FROM posts WHERE id = :id";
 
     public JdbcPostsRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -111,7 +112,10 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
 
     @Override
     public void deletePost(long id) {
-        jdbcTemplate.update(DELETE_POST_QUERY, Map.of("id", id));
+        int rowsDeleted = jdbcTemplate.update(DELETE_POST_QUERY, Map.of("id", id));
+        if (rowsDeleted == 0) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Post not found");
+        }
     }
 
     @Override
@@ -133,6 +137,23 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
         }
         return Optional.ofNullable(newLikeCount).orElse(0);
+    }
+
+    @Override
+    public void updatePostImage(long postId, byte[] image) {
+        int rowsAffected = jdbcTemplate.update(UPDATE_POST_IMAGE_QUERY, Map.of("id", postId, "image", image));
+        if (rowsAffected == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+    }
+
+    @Override
+    public byte[] getPostImage(long postId) {
+        try {
+            return jdbcTemplate.queryForObject(GET_POST_IMAGE_QUERY, Map.of("id", postId), byte[].class);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested image not found");
+        }
     }
 
     private List<String> getTagsByPostId(long postId) {

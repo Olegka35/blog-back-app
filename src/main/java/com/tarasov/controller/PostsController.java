@@ -6,8 +6,10 @@ import com.tarasov.model.dto.posts.PostListResponse;
 import com.tarasov.model.dto.posts.PostResponse;
 import com.tarasov.model.dto.posts.PostUpdateRequest;
 import com.tarasov.service.PostsService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -59,5 +61,20 @@ public class PostsController {
     @PostMapping("/{id}/likes")
     public int addLike(@PathVariable("id") long postId) {
         return postsService.incrementLikeCount(postId);
+    }
+
+    @PutMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> addImage(@PathVariable("id") long id,
+                                         @RequestParam("image") MultipartFile image) {
+        if (image.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        postsService.addImageToPost(id, image);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/{id}/image")
+    public byte[] getImage(@PathVariable("id") long id) {
+        return postsService.getPostImage(id);
     }
 }

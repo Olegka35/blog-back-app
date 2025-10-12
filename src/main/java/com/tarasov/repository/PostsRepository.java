@@ -18,5 +18,7 @@ public interface PostsRepository {
     void deletePostComments(long postId);
     void deletePostTags(long postId);
     int incrementLikeCount(long postId);
+    void updatePostImage(long postId, byte[] image);
+    byte[] getPostImage(long postId);
 }
 

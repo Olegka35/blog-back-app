@@ -8,8 +8,10 @@ import com.tarasov.service.PostsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -90,6 +92,21 @@ public class PostsServiceImpl implements PostsService {
     @Override
     public int incrementLikeCount(long postId) {
         return postsRepository.incrementLikeCount(postId);
+    }
+
+    @Override
+    public void addImageToPost(long postId, MultipartFile image) {
+        try {
+            byte[] bytes = image.getBytes();
+            postsRepository.updatePostImage(postId, bytes);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Image cannot be saved");
+        }
+    }
+
+    @Override
+    public byte[] getPostImage(long postId) {
+        return postsRepository.getPostImage(postId);
     }
 
     private PostSearchCondition combineSearchCondition(String search, int pageSize, int pageNumber) {

@@ -4,6 +4,7 @@ import com.tarasov.model.dto.posts.PostCreateRequest;
 import com.tarasov.model.dto.posts.PostListResponse;
 import com.tarasov.model.dto.posts.PostResponse;
 import com.tarasov.model.dto.posts.PostUpdateRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -14,4 +15,6 @@ public interface PostsService {
     PostResponse updatePost(long id, PostUpdateRequest request);
     void deletePost(long id);
     int incrementLikeCount(long postId);
+    void addImageToPost(long postId, MultipartFile image);
+    byte[] getPostImage(long postId);
 }
