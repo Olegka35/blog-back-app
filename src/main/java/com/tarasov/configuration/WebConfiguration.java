@@ -8,7 +8,13 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "com.tarasov")
+@ComponentScan(basePackages = {
+        "com.tarasov.configuration",
+        "com.tarasov.controller",
+        "com.tarasov.service",
+        "com.tarasov.repository",
+        "com.tarasov.logging"
+})
 @PropertySource("classpath:application.properties")
 @EnableAspectJAutoProxy
 public class WebConfiguration {

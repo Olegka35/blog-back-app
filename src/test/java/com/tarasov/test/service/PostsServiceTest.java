@@ -1,10 +1,11 @@
-package com.tarasov.service;
+package com.tarasov.test.service;
 
 import com.tarasov.model.Post;
 import com.tarasov.model.PostSearchCondition;
 import com.tarasov.model.dto.posts.*;
 import com.tarasov.repository.CommentsRepository;
 import com.tarasov.repository.PostsRepository;
+import com.tarasov.service.PostsService;
 import com.tarasov.service.impl.PostsServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

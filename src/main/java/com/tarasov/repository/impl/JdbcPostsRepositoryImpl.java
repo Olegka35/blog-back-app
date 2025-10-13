@@ -113,7 +113,7 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
     public void deletePost(long id) {
         int rowsDeleted = jdbcTemplate.update(DELETE_POST_QUERY, Map.of("id", id));
         if (rowsDeleted == 0) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Post not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
         }
     }
 

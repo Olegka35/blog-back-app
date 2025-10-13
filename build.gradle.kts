@@ -18,6 +18,8 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.8")
     testImplementation("org.springframework:spring-test")
     compileOnly("jakarta.servlet:jakarta.servlet-api:6.1.0")
+    testImplementation("jakarta.servlet:jakarta.servlet-api:6.1.0")
+    testImplementation("com.jayway.jsonpath:json-path:2.9.0")
 
     implementation(platform("com.fasterxml.jackson:jackson-bom:2.20.0"))
     implementation("com.fasterxml.jackson.core:jackson-databind")
@@ -32,6 +34,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.mockito:mockito-core:5.20.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
+    testImplementation("org.hamcrest:hamcrest:3.0")
+    testImplementation("com.h2database:h2:2.4.240")
 
     implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.2")
     implementation("org.apache.logging.log4j:log4j-core:2.25.2")
