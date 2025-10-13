@@ -8,6 +8,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -67,10 +68,12 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
 
     @Override
     public Post createPost(String title, String text) {
-        long id = jdbcTemplate.queryForObject(CREATE_POST_QUERY,
-                Map.of("title", title, "text", text),
-                Long.class);
-        return new Post(id, title, text, new ArrayList<>(), 0, 0);
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate.getJdbcTemplate())
+                .withTableName("posts")
+                .usingColumns("title", "text")
+                .usingGeneratedKeyColumns("id");
+        Number id = insert.executeAndReturnKey(Map.of("title", title, "text", text));
+        return new Post(id.longValue(), title, text, new ArrayList<>(), 0, 0);
     }
 
     @Override
