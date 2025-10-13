@@ -60,7 +60,9 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
                 SEARCH_POSTS_QUERY + " WHERE id = :id",
                 Map.of("id", id),
                 new PostMapper()
-        ).stream().findFirst();
+        ).stream()
+                .peek(post -> post.setTags(getTagsByPostId(post.getId())))
+                .findFirst();
     }
 
     @Override
@@ -105,7 +107,9 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
                 searchQuery.toString(),
                 params,
                 new PostMapper()
-        );
+        ).stream()
+                .peek(post -> post.setTags(getTagsByPostId(post.getId())))
+                .toList();
         return new PostSearchResult(posts, count);
     }
 
@@ -162,7 +166,7 @@ public class JdbcPostsRepositoryImpl implements PostsRepository {
                     rs.getLong("id"),
                     rs.getString("title"),
                     rs.getString("text"),
-                    getTagsByPostId(rs.getLong("id")),
+                    List.of(),
                     rs.getInt("likes_count"),
                     rs.getInt("comments_count")
             );
