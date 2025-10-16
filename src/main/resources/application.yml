@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/blog_db
+    username: postgres
+    password: postgres
+
+posts:
+  search:
+    max-text-length: 128

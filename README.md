@@ -4,25 +4,25 @@ Backend application for blog system which provides API to work with posts.
 
 # Project build
 
-Project uses Gradle VCS.
+Project uses Maven.
 
 1. Clone repository
 ```
 git clone https://github.com/Olegka35/blog-back-app
 cd <project-directory>
 ```
-2. Build project into .war file
+2. Build project into .jar file
 
 ```
-./gradlew clean build
+./mvnw clean install
 ```
-3. Deploy created .war file into Tomcat project directory:
+3. Launch compiled .jar file:
 
 ``` 
-<TOMCAT_HOME>/webapps/
+java -jar blog-back-app.jar
 ```
 
 # Execute tests
 ```
-./gradlew test
+./mvnw test
 ```
