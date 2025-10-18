@@ -9,6 +9,7 @@ import com.tarasov.blog.service.PostsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -64,6 +65,7 @@ public class PostsServiceImpl implements PostsService {
     }
 
     @Override
+    @Transactional
     public PostResponse createPost(PostCreateRequest request) {
         Post post = postsRepository.createPost(request.title(), request.text());
         request.tags().forEach(tag -> postsRepository.createTag(post.getId(), tag));
@@ -72,6 +74,7 @@ public class PostsServiceImpl implements PostsService {
     }
 
     @Override
+    @Transactional
     public PostResponse updatePost(long id, PostUpdateRequest request) {
         if (request.id() != id) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Post id mismatch");
@@ -87,6 +90,7 @@ public class PostsServiceImpl implements PostsService {
     }
 
     @Override
+    @Transactional
     public void deletePost(long id) {
         postsRepository.deletePostTags(id);
         commentsRepository.deletePostComments(id);
