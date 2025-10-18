@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api/posts")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost")
 public class PostsController {
